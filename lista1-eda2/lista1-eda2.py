@@ -15,6 +15,11 @@ class SequencialSearch:
         vector = list(range(0, self.total_numbers + 1))
         return vector
 
+    @staticmethod
+    def fill_vector_order_different(v):
+        vector = list(range(0, v + 1))
+        return vector
+
     # Preenchendo Vetor Desordenado
     def fill_vector_disorder(self):
         vector = list(range(0, self.total_numbers + 1))
@@ -104,77 +109,23 @@ class SequencialSearch:
 
     #  Função para plotar gráficos
     def plotting_graph(self, total_time):
-        vector = self.fill_vector_order()
-        plt.plot(total_time, vector)
+        new_time = int(round(total_time))
+        time_vector = self.fill_vector_order_different(new_time)
+        vector = self.fill_vector_order_different(new_time)
+
+        plt.plot(time_vector, vector)
         plt.title('Search Method x Time')
-        plt.xlabel('time')
+        plt.xlabel('time x 100000')
         plt.ylabel('vector')
         plt.show()
 
-    #  Busca por fibonacci : Similar a busca binária e a Busca por salto
-    # def fibMonaccian_search(self):
-    #
-    #     # Initialize fibonacci numbers
-    #     arr = self.fill_vector_order
-    #     x = self.valor_a_ser_encontrado
-    #     n = self.total_numbers
-    #     fibMMm2 = 0  # (m-2)'th Fibonacci No.
-    #     fibMMm1 = 1  # (m-1)'th Fibonacci No.
-    #     fibM = fibMMm2 + fibMMm1  # m'th Fibonacci
-    #
-    #     # fibM is going to store the smallest
-    #     # Fibonacci Number greater than or equal to n
-    #     while fibM < n:
-    #         fibMMm2 = fibMMm1
-    #         fibMMm1 = fibM
-    #         fibM = fibMMm2 + fibMMm1
-    #
-    #         # Marks the eliminated range from front
-    #     offset = -1
-    #
-    #     # while there are elements to be inspected.
-    #     # Note that we compare arr[fibMm2] with x.
-    #     # When fibM becomes 1, fibMm2 becomes 0
-    #     while fibM > 1:
-    #
-    #         # Check if fibMm2 is a valid location
-    #         i = min(offset + fibMMm2, n - 1)
-    #
-    #         # If x is greater than the value at
-    #         # index fibMm2, cut the subarray array
-    #         # from offset to i
-    #         if (arr[i] < x):
-    #             fibM = fibMMm1
-    #             fibMMm1 = fibMMm2
-    #             fibMMm2 = fibM - fibMMm1
-    #             offset = i
-    #
-    #             # If x is greater than the value at
-    #         # index fibMm2, cut the subarray
-    #         # after i+1
-    #         elif (arr[i] > x):
-    #             fibM = fibMMm2
-    #             fibMMm1 = fibMMm1 - fibMMm2
-    #             fibMMm2 = fibM - fibMMm1
-    #
-    #             # element found. return index
-    #         else:
-    #             return i
-    #
-    #             # comparing the last element with x */
-    #     if fibMMm1 and arr[(offset + 1)] == x:
-    #         return offset + 1
-    #
-    #         # element not found. return -1
-    #     return -1
 
-
-busca = SequencialSearch(1000, 40)  # Inicialzando o objeto
+busca = SequencialSearch(10000, 1223)  # Inicialzando o objeto
 antes = time.time()
-number = busca.sentry_sequence_search()
+number = busca.jump_search()
 depois = time.time()  # Medindo o tempo
 
-total = (depois - antes) * 1000
+total = (depois - antes) * 100000  # Segundos multiplicados em 10000
 busca.plotting_graph(total)
 
 print(number)
