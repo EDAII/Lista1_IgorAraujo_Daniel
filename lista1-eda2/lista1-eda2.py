@@ -1,5 +1,7 @@
 import time
 import random
+import math
+from bisect import bisect_left
 
 
 class SequencialSearch:
@@ -78,11 +80,90 @@ class SequencialSearch:
             else:
                 end = i - 1
 
+    # Busca por salto: Similar a busca binária, funciona através de saltos
+    def jump_search(self):
+        lys = self.fill_vector_order()
+        val = self.valor_a_ser_encontrado
+        length = len(lys)
+        jump = int(math.sqrt(length))
+        left, right = 0, 0
+        while left < length and lys[left] <= val:
+            right = min(length - 1, left + jump)
+            if lys[left] <= val and lys[right] >= val:
+                break
+            left += jump
+        if left >= length or lys[left] > val:
+            return "Não foi possível encontrar o elemento {}".format(val)
+        right = min(length - 1, right)
+        i = left
+        while i <= right and lys[i] <= val:
+            if lys[i] == val:
+                return "O elemento {} foi encontrado na posição {}".format(val, i)
+            i += 1
+        return "Não foi possível encontrar o elemento {}".format(val)
 
-busca = SequencialSearch(10000000, 12)  # Inicialzando o objeto
+    #  Busca por fibonacci : Similar a busca binária e a Busca por salto
+    def fibMonaccian_search(self):
+
+        # Initialize fibonacci numbers
+        arr = self.fill_vector_order
+        x = self.valor_a_ser_encontrado
+        n = self.total_numbers
+        fibMMm2 = 0  # (m-2)'th Fibonacci No.
+        fibMMm1 = 1  # (m-1)'th Fibonacci No.
+        fibM = fibMMm2 + fibMMm1  # m'th Fibonacci
+
+        # fibM is going to store the smallest
+        # Fibonacci Number greater than or equal to n
+        while fibM < n:
+            fibMMm2 = fibMMm1
+            fibMMm1 = fibM
+            fibM = fibMMm2 + fibMMm1
+
+            # Marks the eliminated range from front
+        offset = -1
+
+        # while there are elements to be inspected.
+        # Note that we compare arr[fibMm2] with x.
+        # When fibM becomes 1, fibMm2 becomes 0
+        while fibM > 1:
+
+            # Check if fibMm2 is a valid location
+            i = min(offset + fibMMm2, n - 1)
+
+            # If x is greater than the value at
+            # index fibMm2, cut the subarray array
+            # from offset to i
+            if (arr[i] < x):
+                fibM = fibMMm1
+                fibMMm1 = fibMMm2
+                fibMMm2 = fibM - fibMMm1
+                offset = i
+
+                # If x is greater than the value at
+            # index fibMm2, cut the subarray
+            # after i+1
+            elif (arr[i] > x):
+                fibM = fibMMm2
+                fibMMm1 = fibMMm1 - fibMMm2
+                fibMMm2 = fibM - fibMMm1
+
+                # element found. return index
+            else:
+                return i
+
+                # comparing the last element with x */
+        if fibMMm1 and arr[(offset + 1)] == x:
+            return offset + 1
+
+            # element not found. return -1
+        return -1
+
+
+busca = SequencialSearch(1000, 40)  # Inicialzando o objeto
 antes = time.time()
-number = busca.binary_search()
-depois = time.time() # Medindo o tempo
+number = busca.fibMonaccian_search()
+depois = time.time()  # Medindo o tempo
 
 total = (depois - antes) * 1000
 
