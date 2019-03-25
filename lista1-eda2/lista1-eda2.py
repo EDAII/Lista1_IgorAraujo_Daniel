@@ -117,8 +117,8 @@ class SequencialSearch:
         plt.title('Time - Search Method')
         plt.xlabel('time(x 1000)')
         plt.ylabel('time(x 1000)')
+        plt.savefig('method.png', bbox_inches='tight')
         plt.show()
-        plt.savefig('method.png')
 
 
 busca = SequencialSearch(1000000, 1223)  # Inicialzando o objeto
