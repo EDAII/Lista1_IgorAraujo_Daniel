@@ -114,9 +114,9 @@ class SequencialSearch:
         vector = self.fill_vector_order_different(new_time)
 
         plt.plot(time_vector, vector)
-        plt.title('Search Method x Time')
-        plt.xlabel('time x 1000')
-        plt.ylabel('vector')
+        plt.title('Time - Search Method')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
         plt.show()
         plt.savefig('method.png')
 
