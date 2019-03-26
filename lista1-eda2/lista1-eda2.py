@@ -41,7 +41,7 @@ class SequencialSearch:
 
     # Busca sequencial com Sentinela: Podemos trabalhar tanto com o vetor ordenado quanto desordenado
     def sentry_sequence_search(self):
-        vector = self.fill_vector_order()
+        vector = self.fill_vector_disorder()
         i = 0
         vector.append(self.valor_a_ser_encontrado)
 
@@ -56,18 +56,21 @@ class SequencialSearch:
     # Busca Binária: Os elementos devem está ordenados
     def binary_search(self):
         vector = self.fill_vector_order()
-        left, right, attempt = 0, len(vector), 1
+        low = 0
+        high = len(vector) - 1
 
-        while 1:
-            middle = int((left + right) / 2)
-            aux_num = vector[middle]
-            if self.valor_a_ser_encontrado == aux_num:
-                return "O elemento {} foi encontrado na posição {}".format(self.valor_a_ser_encontrado, attempt)
-            elif self.valor_a_ser_encontrado > aux_num:
-                left = middle
+        while low <= high:
+            mid = int((low+high)/2)
+            guess = vector[mid]
+
+            if guess == self.valor_a_ser_encontrado:
+                return "O elemento {} foi encontrado".format(self.valor_a_ser_encontrado)
+            elif guess > self.valor_a_ser_encontrado:
+                high = mid - 1
             else:
-                right = middle
-            attempt += 1
+                low = mid + 1
+        return "O elemento {} não foi encontrado".format(self.valor_a_ser_encontrado)
+
 
     # Busca por Interpolação: Os elementos devem está ordenados
     def interpolation_search(self):
@@ -84,6 +87,7 @@ class SequencialSearch:
 
             else:
                 end = i - 1
+        return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
 
     # Busca por salto: Similar a busca binária, funciona através de saltos
     def jump_search(self):
@@ -120,14 +124,53 @@ class SequencialSearch:
         plt.savefig('method.png', bbox_inches='tight')
         plt.show()
 
+    # Função para comparar gráficos
+    def compare_graph(self, total_time_one, total_time_two):
+        new_time_one = int(round(total_time_one))
+        time_vector_one = self.fill_vector_order_different(new_time_one)
+        vector_one = self.fill_vector_order_different(new_time_one)
 
-busca = SequencialSearch(1000000, 1223)  # Inicialzando o objeto
-antes = time.time()
-number = busca.binary_search()
-depois = time.time()  # Medindo o tempo
+        new_time_two = int(round(total_time_two))
+        time_vector_two = self.fill_vector_order_different(new_time_two)
+        vector_two = self.fill_vector_order_different(new_time_two)
 
-total = (depois - antes) * 1000  # Segundos multiplicados em 10000
-busca.plotting_graph(total)
+        plt.subplot(1, 2, 1)
+        plt.plot(time_vector_one, vector_one)
+        plt.title('Tempo 1')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
 
-print(number)
-print("O tempo gasto foi: {:6f} mili-segundos". format(total))
+        plt.subplot(1, 2, 2)
+        plt.plot(time_vector_two, vector_two, color='xkcd:salmon')
+        plt.title('Tempo 2')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
+
+        plt.savefig('compare_methods.png', bbox_inches='tight')
+        plt.show()
+
+
+busca = SequencialSearch(10000000, 5555555)  # Inicialzando o objeto
+
+antes_one = time.time()
+number_one = busca.sentry_sequence_search()
+depois_one = time.time()  # Medindo o tempo
+
+total_one = (depois_one - antes_one) * 1000  # Segundos multiplicados em 10000
+print(number_one)
+# print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
+
+# Plotando a comparação dos metodos
+antes_two = time.time()
+number_two = busca.binary_search()
+depois_two = time.time()  # Medindo o tempo
+
+total_two = (depois_two - antes_two) * 1000  # Segundos multiplicados em 10000
+print(number_two)
+# print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
+busca.compare_graph(total_one, total_two) # Passando  como argumento os tempos de cada busca
+
+
+
+
+
