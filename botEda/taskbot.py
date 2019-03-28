@@ -10,6 +10,12 @@ from db import Busca
 import math
 #library telegram
 import telegram
+import matplotlib.pyplot as plt
+import tkinter
+
+def fill_vector_order_different(v):
+    vector = list(range(0, v + 1))
+    return vector
 
 # Preenchendo Vetor Ordenado
 def fill_vector_order(total_numbers):
@@ -82,7 +88,7 @@ def plotting_graph(total_numbers, total_time):
     plt.xlabel('time(x 1000)')
     plt.ylabel('time(x 1000)')
     plt.savefig('method.png', bbox_inches='tight')
-    # plt.show()
+    plt.show()
 
 # Função para comparar gráficos
 def compare_graph(self, total_time_one, total_time_two):
@@ -186,7 +192,8 @@ def search(search_method,positions,number,type_search,chat):
             db.session.add(busca)
             db.session.commit()
             send_message("A {} levou *{:4f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.typeSearch,busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
-
+            plotting_graph(positions,tempo)
+            
 def handle_updates(updates):
     #andando no json para para chegar no text enviado
     for update in updates["result"]:
@@ -208,7 +215,7 @@ def handle_updates(updates):
         
         if command == '/BSS':
             search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
-            # # plotting_graph(positions,tempo)
+            
             #bot.send_photo(chat_id=chat_id, photo=url)
         elif command =='/Buscas':
             send_message("*-------> Busca Sequencial Simples(BSS)*\n*-------> Busca Sequencial Com Sentinela(BSCS)*\n*-------> Busca Sequencial Indexada(BSI)*\n*-------> Busca Binária(BB)*\n*-------> Busca Por Salto(BPS)*", chat)
