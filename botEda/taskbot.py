@@ -184,15 +184,16 @@ def get_last_update_id(updates):
     return max(update_ids)
 
 def search(search_method,positions,number,type_search,chat):
-            inicio = time.time()
-            posicao=search_method(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=type_search, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A {} levou *{:4f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.typeSearch,busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
-            plotting_graph(positions,tempo)
+    inicio = time.time()
+    posicao=search_method(int(positions),int(number))
+    fim = time.time()
+    tempo = (fim-inicio)*1000
+    busca = Busca(chat=chat, typeSearch=type_search, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
+    db.session.add(busca)
+    db.session.commit()
+    send_message("A {} levou *{:4f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.typeSearch,busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
+    plotting_graph(positions,tempo)
+    return tempo
             
 def handle_updates(updates):
     #andando no json para para chegar no text enviado
@@ -215,15 +216,14 @@ def handle_updates(updates):
         
         if command == '/BSS':
             search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
-            
-            #bot.send_photo(chat_id=chat_id, photo=url)
+            bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))
         elif command =='/Buscas':
             send_message("*-------> Busca Sequencial Simples(BSS)*\n*-------> Busca Sequencial Com Sentinela(BSCS)*\n*-------> Busca Sequencial Indexada(BSI)*\n*-------> Busca Binária(BB)*\n*-------> Busca Por Salto(BPS)*", chat)
             send_message(" Digite '/' a sigla entre parentêses da busca \n ex:*/BSS* (Busca Sequencial Simples)", chat)
         
         elif command =='/BSCS':
             search(sentry_sequence_search,positions,number,'Busca Sequencial Com Sentinela',chat)
-                
+            bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
         elif command == '/BB':
             search(binary_search,positions,number,'Busca Binária',chat)
             
@@ -233,16 +233,44 @@ def handle_updates(updates):
         elif command == '/BPI':
             search(interpolation_search,positions,number,'Busca por Interpolação',chat)
             
+        # elif command == 'BSS@BSCS':
+            
+        # elif command == 'BSS@BB':
+
+        # elif command == 'BSS@BPS':
+
+        # elif command == 'BSS@BPI':
+
+        # elif command == 'BSCS@BSS':
+
+        # elif command == 'BSCS@BB':
+        
+        # elif command == 'BSCS@BPS':
+
+        # elif command == 'BSCS@BPI':
+
+        # elif command == 'BB@BSS':
+
+        # elif command == 'BB@BSCS':
+        
+        # elif command == 'BB@BPI':
+
+        # elif command == 'BPS@BSS':
+
+        # elif command == 'BPS@BPI':
+        
+        # elif command == 'BPS@BSCS':
+
+        # elif command == 'BPS@BB':
+
         elif command == '/List':
             a = ''
             a += '\U0001F4CB Top Buscas\n'
             query = db.session.query(Busca).filter_by(chat=chat).order_by(Busca.tempoExecucao)
             for busca in query.all():
                 a += '[[{}]] {} {}\n'.format(busca.id, busca.typeSearch,busca.tempoExecucao)
-
             send_message(a, chat)
             # a = ''
-
             # a += '\U0001F4DD _Status_\n'
             # query = db.session.query(Busca).filter_by(status='TODO', chat=chat).order_by(Busca.id)
             # a += '\n\U0001F195 *TODO*\n'
@@ -256,7 +284,6 @@ def handle_updates(updates):
             # a += '\n\U00002611 *DONE*\n'
             # for task in query.all():
             #     a += '[[{}]] {}\n'.format(task.id, task.name)
-
             # send_message(a, chat)
 
 def main():
