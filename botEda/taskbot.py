@@ -8,6 +8,8 @@ import sqlalchemy
 import db
 from db import Busca
 import math
+#library telegram
+import telegram
 
 # Preenchendo Vetor Ordenado
 def fill_vector_order(total_numbers):
@@ -58,8 +60,8 @@ def binary_search(total_numbers,valor_a_ser_encontrado):
 
 # Busca por Interpolação: Os elementos devem está ordenados
 def interpolation_search(total_numbers,valor_a_ser_encontrado):
-    vector = fill_vector_order(total_numbers)
     begin = 0
+    vector = fill_vector_order(total_numbers)
     end = len(vector) - 1
     while begin <= end and vector[begin] <= valor_a_ser_encontrado <= vector[end]:
         i = int(begin + (((end - begin)/(vector[end] - vector[begin])) * (valor_a_ser_encontrado - vector[begin])))
@@ -69,6 +71,40 @@ def interpolation_search(total_numbers,valor_a_ser_encontrado):
             begin = i + 1
         else:
             end = i - 1
+
+#  Função para plotar gráficos
+def plotting_graph(total_numbers, total_time):
+    new_time = int(round(total_time))
+    time_vector = fill_vector_order_different(new_time)
+    vector = fill_vector_order_different(new_time)
+    plt.plot(time_vector, vector)
+    plt.title('Time - Search Method')
+    plt.xlabel('time(x 1000)')
+    plt.ylabel('time(x 1000)')
+    plt.savefig('method.png', bbox_inches='tight')
+    # plt.show()
+
+# Função para comparar gráficos
+def compare_graph(self, total_time_one, total_time_two):
+    new_time_one = int(round(total_time_one))
+    time_vector_one = self.fill_vector_order_different(new_time_one)
+    vector_one = self.fill_vector_order_different(new_time_one)
+    new_time_two = int(round(total_time_two))
+    time_vector_two = self.fill_vector_order_different(new_time_two)
+    vector_two = self.fill_vector_order_different(new_time_two)
+    plt.subplot(1, 2, 1)
+    plt.plot(time_vector_one, vector_one)
+    plt.title('Tempo 1')
+    plt.xlabel('time(x 1000)')
+    plt.ylabel('time(x 1000)')
+    plt.subplot(1, 2, 2)
+    plt.plot(time_vector_two, vector_two, color='xkcd:salmon')
+    plt.title('Tempo 2')
+    plt.xlabel('time(x 1000)')
+    plt.ylabel('time(x 1000)')
+
+    plt.show()
+    plt.savefig('compare_methods.png', bbox_inches='tight')
 
 # Busca por salto: Similar a busca binária, funciona através de saltos
 def jump_search(total_numbers,valor_a_ser_encontrado):
@@ -95,7 +131,7 @@ def jump_search(total_numbers,valor_a_ser_encontrado):
 #after take out the token to other file
 TOKEN = "769301141:AAEloGEFdcAJcEUMkvZR28UaAlWUCXKvdNY"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
-
+bot = telegram.Bot(TOKEN)
 HELP = """
  /new NOME
  /todo ID
@@ -141,6 +177,15 @@ def get_last_update_id(updates):
 
     return max(update_ids)
 
+def search(search_method,positions,number,type_search,chat):
+            inicio = time.time()
+            posicao=search_method(int(positions),int(number))
+            fim = time.time()
+            tempo = (fim-inicio)*1000
+            busca = Busca(chat=chat, typeSearch=type_search, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
+            db.session.add(busca)
+            db.session.commit()
+            send_message("A {} levou *{:4f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.typeSearch,busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
 
 def handle_updates(updates):
     #andando no json para para chegar no text enviado
@@ -157,68 +202,55 @@ def handle_updates(updates):
         msg = ''
         if len(message["text"].split(" ", 1)) > 1:
             msg = message["text"].split(" ", 1)[1].strip()
-            msg_final = msg.split(" ")[0].strip()
-            positions=msg.split(" ")[1].strip()
-            number=msg.split(" ")[2].strip()
-            
+            positions = msg.split(" ")[0].strip()
+            number=msg.split(" ")[1].strip()            
         chat = message["chat"]["id"]
-
-        #print(command, msg_final, chat,positions,number)
-
+        
         if command == '/BSS':
-            inicio = time.time()
-            posicao=simple_sequence_search(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=msg_final, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A Busca Sequencial Simples levou *{:6f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
-#            print('TE')  
-            #send_message('Numero não está em nenhuma posição do vetor',chat)
+            search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
+            # # plotting_graph(positions,tempo)
+            #bot.send_photo(chat_id=chat_id, photo=url)
         elif command =='/Buscas':
-            send_message("*-------> Busca Sequencial Simples(BSS)*\n*-------> Busca Sequencial Com Sentinela(BSCS)*\n*-------> Busca Sequencial Indexada(BSI)*\n*-------> Busca Binária(BB)*", chat)
+            send_message("*-------> Busca Sequencial Simples(BSS)*\n*-------> Busca Sequencial Com Sentinela(BSCS)*\n*-------> Busca Sequencial Indexada(BSI)*\n*-------> Busca Binária(BB)*\n*-------> Busca Por Salto(BPS)*", chat)
             send_message(" Digite '/' a sigla entre parentêses da busca \n ex:*/BSS* (Busca Sequencial Simples)", chat)
         
         elif command =='/BSCS':
-            inicio = time.time()
-            posicao=sentry_sequence_search(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=msg_final, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A Busca Sequencial Com Sentinela levou *{:6f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
-         
+            search(sentry_sequence_search,positions,number,'Busca Sequencial Com Sentinela',chat)
                 
         elif command == '/BB':
-            inicio = time.time()
-            posicao=binary_search(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=msg_final, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A Busca Binária levou *{:6f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
+            search(binary_search,positions,number,'Busca Binária',chat)
+            
         elif command == '/BPS':
-            inicio = time.time()
-            posicao=jump_search(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=msg_final, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A Busca por Salto levou *{:6f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
+            search(jump_search,positions,number,'Busca por Salto levou',chat)
             
         elif command == '/BPI':
-            inicio = time.time()
-            posicao=interpolation_search(int(positions),int(number))
-            fim = time.time()
-            tempo = (fim-inicio)*1000
-            busca = Busca(chat=chat, typeSearch=msg_final, positions=int(positions),number=int(number),tempoExecucao=float(tempo))
-            db.session.add(busca)
-            db.session.commit()
-            send_message("A Busca por Interpolação levou *{:6f}* milisegundos para buscar o valor *{}* em um vetor de {} posições na posição *{}*".format(busca.tempoExecucao,busca.number,busca.positions,posicao), chat)
+            search(interpolation_search,positions,number,'Busca por Interpolação',chat)
+            
+        elif command == '/List':
+            a = ''
+            a += '\U0001F4CB Top Buscas\n'
+            query = db.session.query(Busca).filter_by(chat=chat).order_by(Busca.tempoExecucao)
+            for busca in query.all():
+                a += '[[{}]] {} {}\n'.format(busca.id, busca.typeSearch,busca.tempoExecucao)
+
+            send_message(a, chat)
+            # a = ''
+
+            # a += '\U0001F4DD _Status_\n'
+            # query = db.session.query(Busca).filter_by(status='TODO', chat=chat).order_by(Busca.id)
+            # a += '\n\U0001F195 *TODO*\n'
+            # for task in query.all():
+            #     a += '[[{}]] {}\n'.format(busca.id, busca.typeSearch)
+            # query = db.session.query(Task).filter_by(status='DOING', chat=chat).order_by(Task.id)
+            # a += '\n\U000023FA *DOING*\n'
+            # for task in query.all():
+            #     a += '[[{}]] {}\n'.format(task.id, task.name)
+            # query = db.session.query(Task).filter_by(status='DONE', chat=chat).order_by(Task.id)
+            # a += '\n\U00002611 *DONE*\n'
+            # for task in query.all():
+            #     a += '[[{}]] {}\n'.format(task.id, task.name)
+
+            # send_message(a, chat)
 
 def main():
     last_update_id = None
@@ -231,7 +263,7 @@ def main():
             last_update_id = get_last_update_id(updates) + 1
             handle_updates(updates)
 
-        time.sleep(0.5)
+        time.sleep(0.3)
 
 
 if __name__ == '__main__':
