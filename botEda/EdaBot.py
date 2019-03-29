@@ -2,13 +2,63 @@
 import time
 from botConfig import get_url,get_updates,get_json_from_url,get_last_update_id,send_message
 from searchMethods import simple_sequence_search,sentry_sequence_search,jump_search,interpolation_search,binary_search
-from searchMethods import fill_vector_order_different,fill_vector_order,fill_vector_disorder
+from searchMethods import fill_vector_order,fill_vector_disorder
 from searchMethods import plotting_graph,compare_graph,search
 import telegram
 
-TOKEN = "769301141:AAEloGEFdcAJcEUMkvZR28UaAlWUCXKvdNY"
+TOKEN = "644291660:AAE0TNc6nMu4i-eky-5ASn__qJ26kgB63Xg"
 bot = telegram.Bot(TOKEN)
-     
+
+def identify(list_aux):
+    one = "BSS"
+    two = "BSCS"
+    three = "BB"
+    four = "BPS"
+    five = "BPI"
+    new_list = []
+    for search in list_aux:
+        if search == one:
+            aux = simple_sequence_search
+            new_list.append(aux)
+        elif search == two:
+            aux = sentry_sequence_search
+            new_list.append(aux)
+        elif search == three:
+            aux = binary_search
+            new_list.append(aux)
+        elif search == four:
+            aux = jump_search
+            new_list.append(aux)
+        elif search == five:
+            aux = interpolation_search
+            new_list.append(aux)
+    return new_list
+
+def print_search(list_aux):
+    one = "BSS"
+    two = "BSCS"
+    three = "BB"
+    four = "BPS"
+    five = "BPI"
+    new_list = []
+    for search in list_aux:
+        if search == one:
+            aux = "Busca Sequencial Simples"
+            new_list.append(aux)
+        elif search == two:
+            aux = "Busca Sequencial Com Sentinela"
+            new_list.append(aux)
+        elif search == three:
+            aux = "Busca Binária"
+            new_list.append(aux)
+        elif search == four:
+            aux = "Busca Por Salto"
+            new_list.append(aux)
+        elif search == five:
+            aux = "Busca Por Interpolação"
+            new_list.append(aux)
+    return new_list
+
 def handle_updates(updates):
     #andando no json para para chegar no text enviado
     for update in updates["result"]:
@@ -38,69 +88,264 @@ def handle_updates(updates):
         elif command == '/BSS':
             search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
             bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))
-        
+            # print('telegram')
         elif command =='/BSCS':
-            search(sentry_sequence_search,positions,number,'Busca Sequencial Com Sentinela',chat)
-            bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
-        elif command == '/BB':
-            search(binary_search,positions,number,'Busca Binária',chat)
-            
-        elif command == '/BPS':
-            search(jump_search,positions,number,'Busca por Salto levou',chat)
-            
-        elif command == '/BPI':
-            search(interpolation_search,positions,number,'Busca por Interpolação',chat)
-            
-        elif command == '/BSS@BSCS':
             try:
-                first_time=search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
-                second_time=search(sentry_sequence_search,positions,number,'Busca Sequencial Com Sentinela',chat)
+                search(sentry_sequence_search,positions,number,'Busca Sequencial Com Sentinela',chat)
+                bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
+            except:
+                send_message('argumentos inválidos',chat)
+        elif command == '/BB':
+            try:
+                search(binary_search,positions,number,'Busca Binária',chat)
+                bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
+            except:
+                send_message('argumentos inválidos',chat)
+
+        elif command == '/BPS':
+            try:
+                search(jump_search,positions,number,'Busca por Salto',chat)
+                bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
+            except:
+                send_message('argumentos inválidos',chat)
+                 
+        elif command == '/BPI':
+            try:
+                search(interpolation_search,positions,number,'Busca por Interpolação',chat)
+                bot.send_photo(chat_id=chat, photo=open('./method.png', 'rb'))    
+            except:
+                send_message('argumentos inválidos',chat)
+            
+        elif command == '/BSS@BSCS' or command == '/BSCS@BSS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
                 compare_graph(first_time,second_time)
                 bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
                 if first_time > second_time:    
                     eficiencia = (first_time/second_time)
-                    send_message('A busca sequencial simpes foi {}vezes mais rápida que a com sentinela'.format(int(eficiencia)),chat)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
                 elif first_time < second_time:
                     eficiencia = (second_time/first_time)
-                    send_message('A busca sequencial com sentinela foi {} vezes mais rápida que a busca sequencial simples'.format(int(eficiencia)),chat)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
             except:
                 return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            print("Passa")
         
-        elif command == 'BSS@BB':
-            first_time=search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
-            second_time=search(binary_search,positions,number,'Busca Binária',chat)
-            compare_graph(first_time,second_time)
-            bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+        elif command == '/BSS@BB' or command == '/BB@BSS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
             
-        # elif command == 'BSS@BPI':
-            first_time=search(simple_sequence_search,positions,number,'Busca Sequencial Simples',chat)
-            second_time=search(interpolation_search,number,positions,'Busca por Interpolação',chat)
-            compare_graph(first_time,second_time)
-            bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
-        # elif command == 'BSS@BPI':
+        elif command == '/BSS@BPI' or command == '/BPI@BSS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
 
-        # elif command == 'BSCS@BSS':
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
+            
+        elif command == '/BSS@BPS' or command =='/BPS@BSS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
 
-        # elif command == 'BSCS@BB':
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
+
+        elif command == '/BSCS@BB' or command == '/BB@BSCS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
+
+        elif command == '/BSCS@BPS' or command == '/BPS@BSCS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
+
+        elif command == '/BSCS@BPI' or command == '/BPI@BSCS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
+
+        elif command == '/BB@BPI' or command == '/BPI@BB':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
+
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
         
-        # elif command == 'BSCS@BPS':
+        elif command == '/BB@BPS' or command == '/BPS@BB':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
 
-        # elif command == 'BSCS@BPI':
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
 
-        # elif command == 'BB@BSS':
+        elif command == '/BPS@BPI' or command == '/BPI@BPS':
+            try:
+                b = command
+                b_n = b.replace("@", " ")
+                b_new = b_n.replace("/", " ")
+                search_list = b_new.split()
+                list_names = print_search(search_list)
+                list_identify = identify(search_list)
 
-        # elif command == 'BB@BSCS':
+                first_time=search(list_identify[0],positions,number,list_names[0],chat)
+                second_time=search(list_identify[1],positions,number,list_names[1],chat)
+                compare_graph(first_time,second_time)
+                bot.send_photo(chat_id=chat, photo=open('./compare_methods.png', 'rb'))
+                if first_time > second_time:    
+                    eficiencia = (first_time/second_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[1], int(eficiencia), list_names[0]),chat)
+                elif first_time < second_time:
+                    eficiencia = (second_time/first_time)
+                    send_message('A {} foi {} vezes mais rápida que a {}'.format(list_names[0], int(eficiencia),list_names[1]),chat)
+            except:
+                return send_message('OPS.... algum argumento foi passado errado,tente novamente',chat)
+            # print("passa")
         
-        # elif command == 'BB@BPI':
-
-        # elif command == 'BPS@BSS':
-
-        # elif command == 'BPS@BPI':
-        
-        # elif command == 'BPS@BSCS':
-
-        # elif command == 'BPS@BB':
-
         elif command == '/List':
             a = ''
             a += '\U0001F4CB Top Buscas\n'

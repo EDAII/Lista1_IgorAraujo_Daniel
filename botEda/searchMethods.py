@@ -33,7 +33,8 @@ def simple_sequence_search(total_numbers,valor_a_ser_encontrado):
         if vector[i] == valor_a_ser_encontrado:
             return i
         i += 1
-    return "Não foi possível encontrar o elemento {}".format(valor_a_ser_encontrado)
+
+    return -1
 
 # Busca sequencial com Sentinela: Podemos trabalhar tanto com o vetor ordenado quanto desordenado
 def sentry_sequence_search(total_numbers,valor_a_ser_encontrado):
@@ -43,7 +44,7 @@ def sentry_sequence_search(total_numbers,valor_a_ser_encontrado):
     while vector[i] != valor_a_ser_encontrado:
         i += 1
     if i == len(vector) - 1:
-        return "Não foi possível encontrar o elemento {}".format(valor_a_ser_encontrado)
+        return -1
     return  i
    
 # Busca Binária: Os elementos devem está ordenados
@@ -59,7 +60,8 @@ def binary_search(total_numbers,valor_a_ser_encontrado):
             left = middle
         else:
             right = middle
-        attempt += 1
+        attempt += 1      
+    return -1
 
 # Busca por Interpolação: Os elementos devem está ordenados
 def interpolation_search(total_numbers,valor_a_ser_encontrado):
@@ -74,6 +76,7 @@ def interpolation_search(total_numbers,valor_a_ser_encontrado):
             begin = i + 1
         else:
             end = i - 1
+    return -1
 
 #  Função para plotar gráficos
 def plotting_graph(total_time):

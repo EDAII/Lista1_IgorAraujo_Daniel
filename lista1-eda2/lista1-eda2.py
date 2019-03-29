@@ -33,7 +33,7 @@ class SequencialSearch:
 
             i += 1
 
-        return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
+        return -1
 
     # Busca sequencial com Sentinela: Podemos trabalhar tanto com o vetor ordenado quanto desordenado
     def sentry_sequence_search(self):
@@ -45,7 +45,7 @@ class SequencialSearch:
             i += 1
 
         if i == len(vector) - 1:
-            return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
+            return -1
 
         return "O elemento {} foi encontrado na posição {}".format(self.valor_a_ser_encontrado, i)
 
@@ -65,7 +65,7 @@ class SequencialSearch:
                 high = mid - 1
             else:
                 low = mid + 1
-        return "O elemento {} não foi encontrado".format(self.valor_a_ser_encontrado)
+        return -1
 
 
     # Busca por Interpolação: Os elementos devem está ordenados
@@ -83,7 +83,7 @@ class SequencialSearch:
 
             else:
                 end = i - 1
-        return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
+        return -1
 
     # Busca por salto: Similar a busca binária, funciona através de saltos
     def jump_search(self):
@@ -98,15 +98,14 @@ class SequencialSearch:
                 break
             left += jump
         if left >= length or lys[left] > val:
-            return "Não foi possível encontrar o elemento {}".format(val)
+            return -1
         right = min(length - 1, right)
         i = left
         while i <= right and lys[i] <= val:
             if lys[i] == val:
                 return "O elemento {} foi encontrado na posição {}".format(val, i)
             i += 1
-        return "Não foi possível encontrar o elemento {}".format(val)
-
+        return -1
     @staticmethod
     #  Função para plotar gráficos
     def plotting_graph(total_time):
@@ -144,10 +143,10 @@ class SequencialSearch:
         plt.show()
 
 
-busca = SequencialSearch(1000, 40)  # Inicialzando o objeto
+busca = SequencialSearch(1000, 111)  # Inicialzando o objeto
 
 antes_one = time.time()
-number_one = busca.sentry_sequence_search()
+number_one = busca.jump_search()
 depois_one = time.time()  # Medindo o tempo
 
 total_one = (depois_one - antes_one) * 1000  # Segundos multiplicados em 10000
@@ -155,14 +154,14 @@ print(number_one)
 print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
 
 # Plotando a comparação dos metodos
-antes_two = time.time()
-number_two = busca.binary_search()
-depois_two = time.time()  # Medindo o tempo
+# antes_two = time.time()
+# number_two = busca.binary_search()
+# depois_two = time.time()  # Medindo o tempo
 
-total_two = (depois_two - antes_two) * 1000 # Segundos multiplicados em 10000
-print(number_two)
-print("O tempo gasto foi: {:6f} mili-segundos". format(total_two))
-busca.compare_graph(total_one, total_two) # Passando  como argumento os tempos de cada busca
+# total_two = (depois_two - antes_two) * 1000 # Segundos multiplicados em 10000
+# print(number_two)
+# print("O tempo gasto foi: {:6f} mili-segundos". format(total_two))
+# busca.compare_graph(total_one, total_two) # Passando  como argumento os tempos de cada busca
 
 
 
