@@ -2,6 +2,7 @@ import time
 import random
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class SequencialSearch:
@@ -111,38 +112,36 @@ class SequencialSearch:
             i += 1
         return "Não foi possível encontrar o elemento {}".format(val)
 
+    @staticmethod
     #  Função para plotar gráficos
-    def plotting_graph(self, total_time):
-        new_time = int(round(total_time))
-        time_vector = self.fill_vector_order_different(new_time)
-        vector = self.fill_vector_order_different(new_time)
-
-        plt.plot(time_vector, vector)
+    def plotting_graph(total_time):
+        x = np.linspace(0, total_time, 10)
+        y = x
+        plt.plot(x, y)
         plt.title('Time - Search Method')
         plt.xlabel('time(x 1000)')
         plt.ylabel('time(x 1000)')
         plt.savefig('method.png', bbox_inches='tight')
         plt.show()
 
+    @staticmethod
     # Função para comparar gráficos
-    def compare_graph(self, total_time_one, total_time_two):
-        new_time_one = int(round(total_time_one))
-        time_vector_one = self.fill_vector_order_different(new_time_one)
-        vector_one = self.fill_vector_order_different(new_time_one)
+    def compare_graph(total_time_one, total_time_two):
+        x = np.linspace(0, total_time_one, 10)
+        y = x
 
-        new_time_two = int(round(total_time_two))
-        time_vector_two = self.fill_vector_order_different(new_time_two)
-        vector_two = self.fill_vector_order_different(new_time_two)
+        x_2 = np.linspace(0, total_time_two, 10)
+        y_2 = x_2
 
         plt.subplot(1, 2, 1)
-        plt.plot(time_vector_one, vector_one)
-        plt.title('Tempo 1')
+        plt.plot(x, y)
+        plt.title('Time 1')
         plt.xlabel('time(x 1000)')
         plt.ylabel('time(x 1000)')
 
         plt.subplot(1, 2, 2)
-        plt.plot(time_vector_two, vector_two, color='xkcd:salmon')
-        plt.title('Tempo 2')
+        plt.plot(x_2, y_2, color='xkcd:salmon')
+        plt.title('Time 2')
         plt.xlabel('time(x 1000)')
         plt.ylabel('time(x 1000)')
 
@@ -150,7 +149,7 @@ class SequencialSearch:
         plt.show()
 
 
-busca = SequencialSearch(10000000, 5555555)  # Inicialzando o objeto
+busca = SequencialSearch(1000, 40)  # Inicialzando o objeto
 
 antes_one = time.time()
 number_one = busca.sentry_sequence_search()
@@ -158,16 +157,16 @@ depois_one = time.time()  # Medindo o tempo
 
 total_one = (depois_one - antes_one) * 1000  # Segundos multiplicados em 10000
 print(number_one)
-# print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
+print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
 
 # Plotando a comparação dos metodos
 antes_two = time.time()
 number_two = busca.binary_search()
 depois_two = time.time()  # Medindo o tempo
 
-total_two = (depois_two - antes_two) * 1000  # Segundos multiplicados em 10000
+total_two = (depois_two - antes_two) * 1000 # Segundos multiplicados em 10000
 print(number_two)
-# print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
+print("O tempo gasto foi: {:6f} mili-segundos". format(total_two))
 busca.compare_graph(total_one, total_two) # Passando  como argumento os tempos de cada busca
 
 
