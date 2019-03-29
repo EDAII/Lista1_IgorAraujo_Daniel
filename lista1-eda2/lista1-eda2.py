@@ -16,11 +16,6 @@ class SequencialSearch:
         vector = list(range(0, self.total_numbers + 1))
         return vector
 
-    @staticmethod
-    def fill_vector_order_different(v):
-        vector = list(range(0, v + 1))
-        return vector
-
     # Preenchendo Vetor Desordenado
     def fill_vector_disorder(self):
         vector = list(range(0, self.total_numbers + 1))
