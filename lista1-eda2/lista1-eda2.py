@@ -1,5 +1,8 @@
 import time
 import random
+import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class SequencialSearch:
@@ -30,11 +33,11 @@ class SequencialSearch:
 
             i += 1
 
-        return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
+        return -1
 
     # Busca sequencial com Sentinela: Podemos trabalhar tanto com o vetor ordenado quanto desordenado
     def sentry_sequence_search(self):
-        vector = self.fill_vector_order()
+        vector = self.fill_vector_disorder()
         i = 0
         vector.append(self.valor_a_ser_encontrado)
 
@@ -42,25 +45,28 @@ class SequencialSearch:
             i += 1
 
         if i == len(vector) - 1:
-            return "Não foi possível encontrar o elemento {}".format(self.valor_a_ser_encontrado)
+            return -1
 
         return "O elemento {} foi encontrado na posição {}".format(self.valor_a_ser_encontrado, i)
 
     # Busca Binária: Os elementos devem está ordenados
     def binary_search(self):
         vector = self.fill_vector_order()
-        left, right, attempt = 0, len(vector), 1
+        low = 0
+        high = len(vector) - 1
 
-        while 1:
-            middle = int((left + right) / 2)
-            aux_num = vector[middle]
-            if self.valor_a_ser_encontrado == aux_num:
-                return "O elemento {} foi encontrado na posição {}".format(self.valor_a_ser_encontrado, attempt)
-            elif self.valor_a_ser_encontrado > aux_num:
-                left = middle
+        while low <= high:
+            mid = int((low+high)/2)
+            guess = vector[mid]
+
+            if guess == self.valor_a_ser_encontrado:
+                return "O elemento {} foi encontrado".format(self.valor_a_ser_encontrado)
+            elif guess > self.valor_a_ser_encontrado:
+                high = mid - 1
             else:
-                right = middle
-            attempt += 1
+                low = mid + 1
+        return -1
+
 
     # Busca por Interpolação: Os elementos devem está ordenados
     def interpolation_search(self):
@@ -77,14 +83,87 @@ class SequencialSearch:
 
             else:
                 end = i - 1
+        return -1
+
+    # Busca por salto: Similar a busca binária, funciona através de saltos
+    def jump_search(self):
+        lys = self.fill_vector_order()
+        val = self.valor_a_ser_encontrado
+        length = len(lys)
+        jump = int(math.sqrt(length))
+        left, right = 0, 0
+        while left < length and lys[left] <= val:
+            right = min(length - 1, left + jump)
+            if lys[left] <= val and lys[right] >= val:
+                break
+            left += jump
+        if left >= length or lys[left] > val:
+            return -1
+        right = min(length - 1, right)
+        i = left
+        while i <= right and lys[i] <= val:
+            if lys[i] == val:
+                return "O elemento {} foi encontrado na posição {}".format(val, i)
+            i += 1
+        return -1
+    @staticmethod
+    #  Função para plotar gráficos
+    def plotting_graph(total_time):
+        x = np.linspace(0, total_time, 10)
+        y = x
+        plt.plot(x, y)
+        plt.title('Time - Search Method')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
+        plt.savefig('method.png', bbox_inches='tight')
+        plt.show()
+
+    @staticmethod
+    # Função para comparar gráficos
+    def compare_graph(total_time_one, total_time_two):
+        x = np.linspace(0, total_time_one, 10)
+        y = x
+
+        x_2 = np.linspace(0, total_time_two, 10)
+        y_2 = x_2
+
+        plt.subplot(1, 2, 1)
+        plt.plot(x, y)
+        plt.title('Time 1')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
+
+        plt.subplot(1, 2, 2)
+        plt.plot(x_2, y_2, color='xkcd:salmon')
+        plt.title('Time 2')
+        plt.xlabel('time(x 1000)')
+        plt.ylabel('time(x 1000)')
+
+        plt.savefig('compare_methods.png', bbox_inches='tight')
+        plt.show()
 
 
-busca = SequencialSearch(10000000, 12)  # Inicialzando o objeto
-antes = time.time()
-number = busca.binary_search()
-depois = time.time() # Medindo o tempo
+busca = SequencialSearch(1000, 111)  # Inicialzando o objeto
 
-total = (depois - antes) * 1000
+antes_one = time.time()
+number_one = busca.jump_search()
+depois_one = time.time()  # Medindo o tempo
 
-print(number)
-print("O tempo gasto foi: {:6f} mili-segundos". format(total))
+total_one = (depois_one - antes_one) * 1000  # Segundos multiplicados em 10000
+print(number_one)
+print("O tempo gasto foi: {:6f} mili-segundos". format(total_one))
+
+# Plotando a comparação dos metodos
+# antes_two = time.time()
+# number_two = busca.binary_search()
+# depois_two = time.time()  # Medindo o tempo
+
+# total_two = (depois_two - antes_two) * 1000 # Segundos multiplicados em 10000
+# print(number_two)
+# print("O tempo gasto foi: {:6f} mili-segundos". format(total_two))
+# busca.compare_graph(total_one, total_two) # Passando  como argumento os tempos de cada busca
+
+
+
+
+
