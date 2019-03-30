@@ -101,7 +101,7 @@ def compare_graph(total_time_one, total_time_two):
     plt.xlabel('time(x 1000)')
     plt.ylabel('time(x 1000)')
     plt.subplot(1, 2, 2)
-    plt.plot(x_2, y_2, color='xkcd:salmon')
+    plt.plot(x_2, y_2, 'r')
     plt.title('Time 2')
     plt.xlabel('time(x 1000)')
     plt.ylabel('time(x 1000)')
